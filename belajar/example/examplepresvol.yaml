@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nodejs-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity: 
+      storage: 5Gi
+  hostPath:
+    path: /data/location
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nodejs-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+      requests:
+        storage: 1Gi
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: pod-nj-pv
+  labels:
+    name: pod-nj-pv
+spec:
+ volumes:
+   - name: html
+     persistentVolumeClaim:
+        claimName: nodejs-pvc
+ containers:
+    - name: nj-cont
+      image: khannedy/nodejs-writer
+      volumeMounts:
+        - mountPath: /app/html
+          name: html

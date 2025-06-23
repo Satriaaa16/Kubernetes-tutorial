@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod-volume
+  labels:
+    testing: example
+spec:
+  volumes:
+    - name: html-volume
+      emptyDir: {}
+  containers:
+    - name: nodejs-writer
+      image: khannedy/nodejs-writer
+      volumeMounts:
+        - name: html-volume
+          mountPath: /app/html  # Mount path untuk kontainer

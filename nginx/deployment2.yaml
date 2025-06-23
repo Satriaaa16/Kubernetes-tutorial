@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-awal
+  labels:
+    name: deployment-awal
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: deployment-awal
+  template:
+    metadata:
+      name: deployment-awal
+      labels:
+        name:  deployment-awal
+    spec:
+      containers:
+        - name:  nodejs-testing
+          image: khannedy/nodejs-web:2
+          ports:
+            - containerPort: 3000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-awal
+spec:
+  type: NodePort
+  selector:
+    name: deployment-awal
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30002

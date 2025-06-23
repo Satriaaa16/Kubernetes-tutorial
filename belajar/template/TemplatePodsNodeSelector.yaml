@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Pod
+metadata:
+  name: nama-pod
+spec:
+  nodeSelector: 
+    gpu: "true" # label yang ada dinode supaya saat di create dia langsung ke node yang punya label serupa
+  containers:
+    - name: nama-container
+      image: image-name
+      ports:
+        - containerPort: 80
+

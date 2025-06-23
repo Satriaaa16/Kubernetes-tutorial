@@ -1,0 +1,44 @@
+apiVersion: apps/v1  
+kind: Deployment
+metadata:
+  name: resource-dep
+  labels: 
+    name: resource-dep
+spec:
+ replicas: 2
+ selector:
+   matchLabels:
+     name: resource-dep
+ template:
+   metadata:
+     name: resource-dep
+     labels:
+       name: resource-dep
+   spec:
+     containers:
+       - name: cont-resource
+         image: khannedy/nodejs-web
+         ports:
+           - containerPort: 3000
+         resources: 
+           requests: 
+             cpu: 100m
+             memory: 100Mi
+           limits:
+             cpu: 100m
+             memory: 100Mi 
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: resource-svc
+spec:
+  type: NodePort
+  selector:
+    name: resource-dep
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30023

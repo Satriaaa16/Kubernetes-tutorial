@@ -1,0 +1,12 @@
+apiVersion: v1 
+kind: Service 
+metadata:
+  name: service-loadbalancer
+  labels:
+    label-key: label-value
+spec:
+  type: LoadBalancer
+  selector:
+    label-key: label-value
+  ports:
+    - port: 80

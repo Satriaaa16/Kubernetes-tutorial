@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSets
+metadata: 
+  name: name-statefulset
+  labels:
+    name: name-statefulset
+spec:
+   # https://github.com/kubernetes/kubernetes/issues/69608
+  serviceName: name-statefull-service
+  replicas: 3
+  selector:
+    matchlabels:
+      name: name-statefulset
+  volumeClaimTemplate:
+    - metadata:
+        name: name-stateful-volume-claim
+      spec:
+        accessModes:
+          - ReadWriteOnce
+       volumeMode: Filesystem
+       resources:
+         requests:
+           storage: 1Gi
+
+  template:
+    metadata:
+      name: name-statefulset
+      labels:
+        name: name-statefulset
+    spec:
+      containers:
+        - name: image-stateful
+          image: image/stateful
+          volumeMounts: 
+            - mountPath: /app/data
+              name: name-stateful-volume-claim

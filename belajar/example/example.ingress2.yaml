@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-test
+  labels:
+    aplikasi: testing
+spec:
+  containers:
+    - name: pod-at-app
+      image: nginx
+      ports:
+        - containerPort: 80  
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: webserver-service
+spec: 
+  selector:
+    aplikasi: testing
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress2
+  labels:
+    name: nginx-ingress2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: nginx.atgoalkeeper.co.id
+      http: 
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: webserver-service # nama service di metadata 
+                port:
+                  number: 80
+
+    

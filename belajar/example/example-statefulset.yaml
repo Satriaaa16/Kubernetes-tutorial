@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-statefulset
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 5Gi
+  hostPath:
+    path: /data/location
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: statefulset-awal
+  labels:
+    name: statefulset-awal
+spec:
+  serviceName: statefulset-service
+  replicas: 3
+  selector:
+    matchLabels:
+      name: statefulset-awal
+  volumeClaimTemplates:
+    - metadata:
+        name: pv-statefulset-claim
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        volumeMode: Filesystem
+        resources:
+          requests:
+            storage: 1Gi
+  template:
+    metadata:
+      name: statefulset-awal
+      labels:
+        name: statefulset-awal
+    spec:
+      containers:
+        - name: cont-stateful
+          image: khannedy/nodejs-stateful
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - mountPath: /app/data
+              name: pv-statefulset-claim

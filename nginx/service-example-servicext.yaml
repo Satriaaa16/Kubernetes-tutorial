@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: testing-service
+  labels:
+    belajar: testing
+spec:
+  type: ExternalName
+  externalName: example.com
+  ports:
+    - port: 80
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: curlv1
+  labels:
+    belajar: testing
+spec:
+  containers:
+    - name: curlv1
+      image: nginx
