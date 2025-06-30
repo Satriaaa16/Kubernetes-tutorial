@@ -37,5 +37,5 @@ jobs:
 
       - name: Cek manifest berhasil atau engga
         run: | 
-          echo "jadi gini bor"
+          kubectl wait --for=condition=ready pod --all -n belajar --timeout=60s
           kubectl get all -n belajar
