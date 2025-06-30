@@ -7,12 +7,12 @@ on:
 jobs:
   job1:
     runs-on: ubuntu-latest
-    name: build example and deploy to minikube
+    name: Build and deploy to Minikube
     steps:
       - name: Checkout current PR
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2  # untuk bisa bandingkan 2 commit
+          fetch-depth: 2
 
       - name: Start Minikube
         uses: medyagh/setup-minikube@latest
@@ -23,7 +23,7 @@ jobs:
       - name: Clone repo berisi manifest
         run: git clone https://github.com/Satriaaa16/Kubernetes-tutorial.git
 
-      - name: Build image
+      - name: Build image (non-functional on GitHub-hosted runner)
         run: |
           cd Kubernetes-tutorial
           minikube image build -t local/devex:v1 .
@@ -31,11 +31,11 @@ jobs:
       - name: Membuat namespace belajar
         run: kubectl create ns belajar || true
 
-      - name: Cari dan deploy hanya file YAML yang berubah
+      - name: Deploy file YAML
         run: |
-           kubectl create -f Kubernetes-tutorial/belajar/example/pod.yaml
+          kubectl apply -f Kubernetes-tutorial/belajar/example/pod.yaml -n belajar
 
       - name: Cek manifest berhasil atau engga
-        run: | 
+        run: |
           kubectl wait --for=condition=ready pod --all -n belajar --timeout=60s
           kubectl get all -n belajar
