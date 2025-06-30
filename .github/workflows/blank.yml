@@ -18,7 +18,8 @@ jobs:
       run: |
         minikube image build -t local/devex:v1 .
     - name: Deploy to minikube
-      run:
-        kubectl apply -f deploy/k8s.yaml
-        kubectl wait --for=condition=ready pod -l app=local-devex
+      run: |
+        kubectl apply -f belajar/
+        kubectl wait --for=condition=ready pod --all -n belajar --timeout=60s
+
     
