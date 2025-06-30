@@ -1,28 +1,39 @@
 name: CI Minikube
+
 on:
   pull_request:
     branches: [ "master" ]
+
 jobs:
   job1:
     runs-on: ubuntu-latest
     name: build example and deploy to minikube
     steps:
-    - uses: actions/checkout@v4
-      with:
-        repository: medyagh/local-dev-example-with-minikube
-    - name: Start minikube
-      uses: medyagh/setup-minikube@latest
-    - name: Try the cluster!
-      run: kubectl get pods -A
-    - name: Build image
-      run: |
-        minikube image build -t local/devex:v1 .
-    - name: Deploy to minikube
-      run: |
-        ls
-        git clone https://github.com/Satriaaa16/Kubernetes-tutorial.git
-        ls
-        kubectl apply -f Kubernetes-tutorial/belajar/example/
-        kubectl wait --for=condition=ready pod --all -n belajar --timeout=60s
+      - name: Checkout current PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # untuk bisa bandingkan 2 commit
 
-    
+      - name: Start Minikube
+        uses: medyagh/setup-minikube@latest
+
+      - name: Try the cluster!
+        run: kubectl get pods -A
+
+      - name: Build image
+        run: |
+          minikube image build -t local/devex:v1 .
+
+      - name: Clone repo berisi manifest
+        run: git clone https://github.com/Satriaaa16/Kubernetes-tutorial.git
+
+      - name: Cari dan deploy hanya file YAML yang berubah
+        run: |
+          echo "File YAML yang berubah:"
+          git diff --name-only origin/master HEAD | grep '^Kubernetes-tutorial/belajar/example/.*\.ya\?ml$' || true > changed_files.txt
+
+          cat changed_files.txt
+
+          while read file; do
+            [ -f "$file" ] && kubectl apply -f "$file" -n belajar || echo "File $file tidak ditemukan, dilewati..."
+          done < changed_files.txt
