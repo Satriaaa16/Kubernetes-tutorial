@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata: 
-  name: pod-contoh-c0
+  name: pod-contoh-c
   namespace: belajar
 spec:
   containers:
