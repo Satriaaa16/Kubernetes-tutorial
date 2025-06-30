@@ -37,3 +37,10 @@ jobs:
           while read file; do
             [ -f "$file" ] && kubectl apply -f "$file" -n belajar || echo "File $file tidak ditemukan, dilewati..."
           done < changed_files.txt
+
+      - name: cek manifest berhasil atau engga
+        run: | 
+            echo "jadi gini bor"
+            kubectl get all --all
+            export hasil=changed_files.txt
+
