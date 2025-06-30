@@ -20,6 +20,8 @@ jobs:
     - name: Deploy to minikube
       run: |
         ls
+        git clone https://github.com/Satriaaa16/Kubernetes-tutorial.git
+        ls
         kubectl apply -f belajar/example/
         kubectl wait --for=condition=ready pod --all -n belajar --timeout=60s
 
