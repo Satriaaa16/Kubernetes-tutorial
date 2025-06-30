@@ -41,6 +41,8 @@ jobs:
       - name: cek manifest berhasil atau engga
         run: | 
             echo "jadi gini bor"
-            kubectl get all --all
+            kubectl get all -n belajar
             export hasil=changed_files.txt
+
+            echo $hasil
 
