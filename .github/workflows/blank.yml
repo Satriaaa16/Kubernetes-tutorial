@@ -19,7 +19,7 @@ jobs:
         minikube image build -t local/devex:v1 .
     - name: Deploy to minikube
       run: |
-        kubectl apply -f belajar/example
+        kubectl apply -f belajar/example/
         kubectl wait --for=condition=ready pod --all -n belajar --timeout=60s
 
     
