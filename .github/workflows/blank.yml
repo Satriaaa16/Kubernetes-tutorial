@@ -33,7 +33,7 @@ jobs:
 
       - name: Cari dan deploy hanya file YAML yang berubah
         run: |
-           kubectl create -f Kubernetes-tutorial/belajar/example
+           kubectl create -f Kubernetes-tutorial/belajar/example/pod.yaml
 
       - name: Cek manifest berhasil atau engga
         run: | 
