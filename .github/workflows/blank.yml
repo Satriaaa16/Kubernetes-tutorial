@@ -33,15 +33,7 @@ jobs:
 
       - name: Cari dan deploy hanya file YAML yang berubah
         run: |
-          echo "File YAML yang berubah:"
-          git fetch origin
-          git diff --name-only origin/master HEAD | grep '^Kubernetes-tutorial/belajar/example/.*\.ya\?ml$' || true > changed_files.txt
-
-          cat changed_files.txt
-
-          while read file; do
-            [ -f "$file" ] && kubectl apply -f "$file" -n belajar || echo "File $file tidak ditemukan, dilewati..."
-          done < changed_files.txt
+           kubectl create -f Kubernetes-tutorial/belajar/example
 
       - name: Cek manifest berhasil atau engga
         run: | 
