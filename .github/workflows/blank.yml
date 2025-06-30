@@ -20,16 +20,21 @@ jobs:
       - name: Try the cluster!
         run: kubectl get pods -A
 
-      - name: Build image
-        run: |
-          minikube image build -t local/devex:v1 .
-
       - name: Clone repo berisi manifest
         run: git clone https://github.com/Satriaaa16/Kubernetes-tutorial.git
+
+      - name: Build image
+        run: |
+          cd Kubernetes-tutorial
+          minikube image build -t local/devex:v1 .
+
+      - name: Membuat namespace belajar
+        run: kubectl create ns belajar || true
 
       - name: Cari dan deploy hanya file YAML yang berubah
         run: |
           echo "File YAML yang berubah:"
+          git fetch origin
           git diff --name-only origin/master HEAD | grep '^Kubernetes-tutorial/belajar/example/.*\.ya\?ml$' || true > changed_files.txt
 
           cat changed_files.txt
@@ -38,11 +43,7 @@ jobs:
             [ -f "$file" ] && kubectl apply -f "$file" -n belajar || echo "File $file tidak ditemukan, dilewati..."
           done < changed_files.txt
 
-      - name: cek manifest berhasil atau engga
+      - name: Cek manifest berhasil atau engga
         run: | 
-            echo "jadi gini bor"
-            kubectl get all -n belajar
-            export hasil=changed_files.txt
-
-            echo $hasil
-
+          echo "jadi gini bor"
+          kubectl get all -n belajar
