@@ -34,6 +34,15 @@ spec:
             - "--config.file=/etc/prometheus-config/prometheus.yml"
           ports:
             - containerPort: 9090
+          livenessProbe:
+            httpGet: 
+              path: /
+              port: 9090
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            #  failureThreshold: 10
+            #  successThreshold: 3
+            #  timeoutSeconds: 5
           volumeMounts:
             - name: promeprome-data
               mountPath: /etc/prometheus
