@@ -33,7 +33,7 @@ jobs:
 
       - name: Deploy file YAML
         run: |
-          kubectl apply -f Kubernetes-tutorial/belajar/example/pod.yaml -n belajar
+          kubectl apply -f development/monitoring/prometheus -n belajar
 
       - name: Cek manifest berhasil atau engga
         run: |
