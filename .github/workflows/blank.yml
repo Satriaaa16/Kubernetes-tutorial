@@ -28,14 +28,14 @@ jobs:
           cd Kubernetes-tutorial
           minikube image build -t local/devex:v1 .
 
-      - name: Membuat namespace belajar
-        run: kubectl create ns belajar || true
+      - name: Membuat namespace monitoring
+        run: kubectl create ns monitoring || true
 
       - name: Deploy file YAML
         run: |
-          kubectl apply -f development/monitoring/prometheus -n belajar
+          kubectl apply -f development/monitoring/prometheus -n monitoring
 
       - name: Cek manifest berhasil atau engga
         run: |
-          kubectl wait --for=condition=ready pod --all -n belajar --timeout=60s
+          kubectl wait --for=condition=ready pod --all -n monitorinf --timeout=60s
           kubectl get all -n belajar
