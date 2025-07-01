@@ -38,7 +38,7 @@ spec:
             httpGet: 
               path: /
               port: 9090
-            initialDelaySeconds: 3
+            initialDelaySeconds: 4
             periodSeconds: 5
             #  failureThreshold: 10
             #  successThreshold: 3
