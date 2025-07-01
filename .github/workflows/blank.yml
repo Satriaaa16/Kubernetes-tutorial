@@ -37,5 +37,5 @@ jobs:
 
       - name: Cek manifest berhasil atau engga
         run: |
-          kubectl wait --for=condition=ready pod --all -n monitorinf --timeout=60s
+          kubectl wait --for=condition=ready pod --all -n monitoring --timeout=60s
           kubectl get all -n belajar
