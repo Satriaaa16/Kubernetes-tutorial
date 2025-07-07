@@ -1,4 +1,4 @@
-name: CI Minikube
+name: CI Minikube Monitoring Namespace
 
 on:
   pull_request:
