@@ -33,7 +33,7 @@ jobs:
 
       - name: Deploy file YAML
         run: |
-          kubectl apply -f /belajar/example/* -n monitoring
+          kubectl apply -f /belajar/example -n monitoring
 
       - name: Cek manifest berhasil atau engga
         run: |
