@@ -1,4 +1,4 @@
-name: CI Minikube
+name: CI Minikube belajar Namespace
 
 on:
   pull_request:
@@ -33,7 +33,7 @@ jobs:
 
       - name: Deploy file YAML
         run: |
-          kubectl apply -f /belajar/example -n belajar
+          kubectl apply -f belajar/example -n belajar
 
       - name: Cek manifest berhasil atau engga
         run: |
