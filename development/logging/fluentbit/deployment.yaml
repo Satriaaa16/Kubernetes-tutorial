@@ -1,6 +1,6 @@
 apiVersion: apps/v1
 kind: DaemonSet
-metadata: 
+metadata:
   name: daemon-fluentb
   namespace: monitoring
   labels:
@@ -11,7 +11,7 @@ spec:
       app.kubernetes.io/name: fluent-bit
   updateStrategy:
     type: RollingUpdate
-  template: 
+  template:
     metadata:
       labels:
         app.kubernetes.io/name: fluent-bit
@@ -27,15 +27,16 @@ spec:
               cpu: "100m"
               memory: "200Mi"
           volumeMounts:
-          - name: config
-            mountPath: /fluent-bit/etc
-          - name: varlog
-            mountPath: /var/log
-            readOnly: true
-          - name: varlibdockercontainers
-            mountPath: /var/lib/docker/containers
-          - name: state
-            mountPath: /var/fluent-bit/state
+            - name: config
+              mountPath: /fluent-bit/etc
+            - name: varlog
+              mountPath: /var/log
+              readOnly: false
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: state
+              mountPath: /var/fluent-bit/state
           livenessProbe:
             httpGet:
               path: /api/v1/health
