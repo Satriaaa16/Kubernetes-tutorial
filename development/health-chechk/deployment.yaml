@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: uptimekuma-d
+  namespace: monitoring
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: uptimekuma-d
+  template:
+    metadata:
+      labels:
+        app: uptimekuma-d
+    spec:
+     containers: 
+       - name: uptime-kuma-containers
+         image: louislam/uptime-kuma:1
+         imagePullPolicy: IfNotPresent
+         resources:
+           requests:
+             cpu: "50m"
+             memory: "200Mi"
+           limits:
+             cpu: "80m"
+             memory: "210Mi"
+            
+         ports:
+           - containerPort: 3001
+         volumeMounts:
+           - name: kumakuma-data
+             mountPath: /app/data
+         livenessProbe:
+           tcpSocket: 
+             port: 3001
+           initialDelaySeconds: 15
+           periodSeconds: 15
+         readinessProbe:
+           tcpSocket:
+             port: 3001
+           initialDelaySeconds: 15
+           periodSeconds: 15
+     volumes:
+       - name: kumakuma-data
+         persistentVolumeClaim:
+           claimName: pvc-kuma
+
