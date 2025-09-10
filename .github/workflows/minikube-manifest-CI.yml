@@ -31,11 +31,15 @@ jobs:
           kubectl create ns monitoring || true
           kubectl create ns devops || true
 
-      - name: Deploy hanya workload + ConfigMap
+      - name: Deploy workload + ConfigMap (skip template dir)
         run: |
           for file in $(find Kubernetes-tutorial/ -name "*.yaml" -o -name "*.yml"); do
+            if [[ $file == *"belajar/template/"* ]]; then
+              echo "⏭️ Skipping template file: $file"
+              continue
+            fi
+
             echo "🔎 Checking $file"
-            # cek per dokumen di file
             count=$(yq e 'select(.kind == "Deployment" or 
                                 .kind == "StatefulSet" or 
                                 .kind == "DaemonSet" or 
@@ -43,22 +47,8 @@ jobs:
                                 .kind == "CronJob" or 
                                 .kind == "ReplicaSet" or 
                                 .kind == "ConfigMap") | length' "$file" | wc -l)
+
             if [ "$count" -gt 0 ]; then
               echo "✅ Applying workloads from $file"
               yq e 'select(.kind == "Deployment" or 
-                           .kind == "StatefulSet" or 
-                           .kind == "DaemonSet" or 
-                           .kind == "Job" or 
-                           .kind == "CronJob" or 
-                           .kind == "ReplicaSet" or 
-                           .kind == "ConfigMap")' "$file" | kubectl apply -f -
-            else
-              echo "⏭️ Skipping $file (bukan workload/ConfigMap)"
-            fi
-          done
-
-      - name: Tunggu workload siap
-        run: |
-          kubectl wait --for=condition=available deployment --all --all-namespaces --timeout=120s || true
-          kubectl wait --for=condition=ready pod --all --all-namespaces --timeout=120s || true
-          kubectl get all --all-namespaces
+                           .kind == "
