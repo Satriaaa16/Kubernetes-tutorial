@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jenk-ing
+  namespace: devops
+spec:
+  rules:
+  - host: jenkins.alan.my.id
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: svc-jenkins
+            port:
+              number: 8080

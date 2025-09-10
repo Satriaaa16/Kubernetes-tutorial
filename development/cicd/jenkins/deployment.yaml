@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-deployment
+  namespace: devops
+  labels:
+    app: jenkins-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins-app
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: jenkins-app
+    spec:
+      securityContext:
+          fsGroup: 2000
+          runAsUser: 2000
+          runAsGroup: 1000
+      containers:
+        - name: jenkins
+          image: jenkins/jenkins:lts
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          ports:
+            - name: httpport
+              containerPort: 8080
+            - name: jnlpport
+              containerPort: 50000
+          livenessProbe:
+            httpGet:
+              path: "/login"
+              port: 8080
+            initialDelaySeconds: 100
+            periodSeconds: 15
+            timeoutSeconds: 15
+            failureThreshold: 15
+          readinessProbe:
+              httpGet:
+                path: "/login"
+                port: 8080
+              initialDelaySeconds: 70
+              periodSeconds: 15
+              timeoutSeconds: 15
+              failureThreshold: 15
+          volumeMounts:
+              - name: jenkins-data
+                mountPath: /var/jenkins_home
+      volumes:
+        - name: jenkins-data
+          persistentVolumeClaim:
+            claimName: jenkins-pv-claim
