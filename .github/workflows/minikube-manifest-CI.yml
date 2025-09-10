@@ -33,22 +33,34 @@ jobs:
 
       - name: Deploy workload + ConfigMap (skip template dir)
         run: |
-          for file in $(find Kubernetes-tutorial/ -name "*.yaml" -o -name "*.yml"); do
-            if [[ $file == *"belajar/template/"* ]]; then
-              echo "⏭️ Skipping template file: $file"
-              continue
-            fi
-
+          # Cari file YAML tapi skip direktori belajar/template
+          for file in $(find Kubernetes-tutorial/ -type f \( -name "*.yaml" -o -name "*.yml" \) ! -path "*/belajar/template/*"); do
             echo "🔎 Checking $file"
+            # filter hanya kind tertentu
             count=$(yq e 'select(.kind == "Deployment" or 
                                 .kind == "StatefulSet" or 
                                 .kind == "DaemonSet" or 
                                 .kind == "Job" or 
                                 .kind == "CronJob" or 
                                 .kind == "ReplicaSet" or 
-                                .kind == "ConfigMap") | length' "$file" | wc -l)
+                                .kind == "ConfigMap") | length' "$file" 2>/dev/null | wc -l)
 
             if [ "$count" -gt 0 ]; then
               echo "✅ Applying workloads from $file"
               yq e 'select(.kind == "Deployment" or 
-                           .kind == "
+                           .kind == "StatefulSet" or 
+                           .kind == "DaemonSet" or 
+                           .kind == "Job" or 
+                           .kind == "CronJob" or 
+                           .kind == "ReplicaSet" or 
+                           .kind == "ConfigMap")' "$file" 2>/dev/null | kubectl apply -f - || true
+            else
+              echo "⏭️ Skipping $file (not workload/ConfigMap)"
+            fi
+          done
+
+      - name: Tunggu workload siap (max 60s)
+        run: |
+          kubectl wait --for=condition=available deployment --all --all-namespaces --timeout=60s || true
+          kubectl wait --for=condition=ready pod --all --all-namespaces --timeout=60s || true
+          kubectl get all --all-namespaces
