@@ -1,4 +1,4 @@
-name: CI Minikube Deploy All
+name: CI Minikube Workload + ConfigMap
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 jobs:
   job1:
     runs-on: ubuntu-latest
-    name: Build and deploy to Minikube
+    name: Build and deploy workloads + ConfigMap to Minikube
     steps:
       - name: Checkout current PR
         uses: actions/checkout@v4
@@ -28,11 +28,24 @@ jobs:
           cd Kubernetes-tutorial
           minikube image build -t local/devex:v1 .
 
-      - name: Deploy semua manifest
+      - name: Buat namespace monitoring & devops
         run: |
-          kubectl apply -R -f Kubernetes-tutorial/
+          kubectl create ns monitoring || true
+          kubectl create ns devops || true
 
-      - name: Tunggu semua pod ready
+      - name: Deploy workload (Deployment, StatefulSet, dsb) + ConfigMap
         run: |
-          kubectl wait --for=condition=ready pod --all --all-namespaces --timeout=120s
+          for file in $(find Kubernetes-tutorial/ -name "*.yaml" -o -name "*.yml"); do
+            if grep -qE "kind: (Deployment|StatefulSet|DaemonSet|Job|CronJob|ReplicaSet|ConfigMap)" "$file"; then
+              echo "Deploying $file"
+              kubectl apply -f "$file"
+            else
+              echo "Skipping $file (tidak termasuk workload/ConfigMap)"
+            fi
+          done
+
+      - name: Tunggu workload siap
+        run: |
+          kubectl wait --for=condition=available deployment --all --all-namespaces --timeout=120s || true
+          kubectl wait --for=condition=ready pod --all --all-namespaces --timeout=120s || true
           kubectl get all --all-namespaces
