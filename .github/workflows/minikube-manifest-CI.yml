@@ -36,9 +36,7 @@ jobs:
 
       - name: Deploy file YAML
         run: |
-          kubectl apply -f development/monitoring/ -n monitoring
-          kubectl apply -f development/monitoring/ -n monitoring
-           kubectl apply -f development/cicd/ -n devops
+           kubectl apply -f development/cicd/jenkins/deployment.yaml -n devops
           
 
       - name: Cek manifest berhasil atau engga
