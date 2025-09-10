@@ -1,4 +1,4 @@
-name: CI Minikube Workload + ConfigMap
+name: CI Minikube Workload Only
 
 on:
   pull_request:
@@ -23,24 +23,37 @@ jobs:
       - name: Clone repo berisi manifest
         run: git clone https://github.com/Satriaaa16/Kubernetes-tutorial.git
 
-      - name: Build image (opsional, hanya kalau perlu)
-        run: |
-          cd Kubernetes-tutorial
-          minikube image build -t local/devex:v1 .
+      - name: Install yq (YAML processor)
+        run: sudo snap install yq
 
       - name: Buat namespace monitoring & devops
         run: |
           kubectl create ns monitoring || true
           kubectl create ns devops || true
 
-      - name: Deploy workload (Deployment, StatefulSet, dsb) + ConfigMap
+      - name: Deploy hanya workload + ConfigMap
         run: |
           for file in $(find Kubernetes-tutorial/ -name "*.yaml" -o -name "*.yml"); do
-            if grep -qE "kind: (Deployment|StatefulSet|DaemonSet|Job|CronJob|ReplicaSet|ConfigMap)" "$file"; then
-              echo "Deploying $file"
-              kubectl apply -f "$file"
+            echo "🔎 Checking $file"
+            # cek per dokumen di file
+            count=$(yq e 'select(.kind == "Deployment" or 
+                                .kind == "StatefulSet" or 
+                                .kind == "DaemonSet" or 
+                                .kind == "Job" or 
+                                .kind == "CronJob" or 
+                                .kind == "ReplicaSet" or 
+                                .kind == "ConfigMap") | length' "$file" | wc -l)
+            if [ "$count" -gt 0 ]; then
+              echo "✅ Applying workloads from $file"
+              yq e 'select(.kind == "Deployment" or 
+                           .kind == "StatefulSet" or 
+                           .kind == "DaemonSet" or 
+                           .kind == "Job" or 
+                           .kind == "CronJob" or 
+                           .kind == "ReplicaSet" or 
+                           .kind == "ConfigMap")' "$file" | kubectl apply -f -
             else
-              echo "Skipping $file (tidak termasuk workload/ConfigMap)"
+              echo "⏭️ Skipping $file (bukan workload/ConfigMap)"
             fi
           done
 
