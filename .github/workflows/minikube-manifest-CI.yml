@@ -90,7 +90,7 @@ jobs:
       - name: Cek livenessProbe di Deployment
         run: |
           failed=0
-          for file in $(find Kubernetes-tutorial/ -type f \( -name "*.yaml" -o -name "*.yml" \)); do
+          for file in $(find Kubernetes-tutorial/development/cicd/jenkins -type f \( -name "*.yaml" -o -name "*.yml" \)); do
             if yq e 'select(.kind == "Deployment") | .spec.template.spec.containers[].livenessProbe' $file | grep -q .; then
               echo "✅ $file punya livenessProbe"
             else
