@@ -74,3 +74,12 @@ jobs:
           kubectl wait --for=condition=available deployment --all --all-namespaces --timeout=60s || true
           kubectl wait --for=condition=ready pod --all --all-namespaces --timeout=60s || true
           kubectl get all --all-namespaces
+
+  testing-job:
+    run-on: ubuntu-latest
+    needs: deploy-job
+    steps: 
+      - name: masuk pod
+        run: |
+           kubectl top pod
+           kubectl top node
