@@ -3,11 +3,12 @@ name: CI Minikube Workload Only
 on:
   pull_request:
     branches: [ "master" ]
+  workflow_dispatch:   # bisa run manual juga
 
 jobs:
-  job1:
+  build-job:
     runs-on: ubuntu-latest
-    name: Build and deploy workloads + ConfigMap to Minikube
+    name: Build image di Minikube
     steps:
       - name: Checkout current PR
         uses: actions/checkout@v4
@@ -23,8 +24,31 @@ jobs:
       - name: Clone repo berisi manifest
         run: git clone https://github.com/Satriaaa16/Kubernetes-tutorial.git
 
+      - name: Build image
+        run: |
+          cd Kubernetes-tutorial
+          minikube image build -t local/devex:v1 .
+
+  deploy-job:
+    runs-on: ubuntu-latest
+    name: Deploy workloads + ConfigMap ke Minikube
+    needs: build-job   # job ini nunggu build-job selesai
+    steps:
+      - name: Checkout current PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Start Minikube
+        uses: medyagh/setup-minikube@latest
+
+      - name: Clone repo berisi manifest
+        run: git clone https://github.com/Satriaaa16/Kubernetes-tutorial.git
+
       - name: Install yq (YAML processor)
-        run: sudo snap install yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yq
 
       - name: Buat namespace monitoring & devops
         run: |
@@ -33,30 +57,16 @@ jobs:
 
       - name: Deploy workload + ConfigMap (skip template dir)
         run: |
-          # Cari file YAML tapi skip direktori belajar/template
           for file in $(find Kubernetes-tutorial/ -type f \( -name "*.yaml" -o -name "*.yml" \) ! -path "*/belajar/template/*"); do
             echo "🔎 Checking $file"
-            # filter hanya kind tertentu
-            count=$(yq e 'select(.kind == "Deployment" or 
-                                .kind == "StatefulSet" or 
-                                .kind == "DaemonSet" or 
-                                .kind == "Job" or 
-                                .kind == "CronJob" or 
-                                .kind == "ReplicaSet" or 
-                                .kind == "ConfigMap") | length' "$file" 2>/dev/null | wc -l)
-
-            if [ "$count" -gt 0 ]; then
-              echo "✅ Applying workloads from $file"
-              yq e 'select(.kind == "Deployment" or 
-                           .kind == "StatefulSet" or 
-                           .kind == "DaemonSet" or 
-                           .kind == "Job" or 
-                           .kind == "CronJob" or 
-                           .kind == "ReplicaSet" or 
-                           .kind == "ConfigMap")' "$file" 2>/dev/null | kubectl apply -f - || true
-            else
-              echo "⏭️ Skipping $file (not workload/ConfigMap)"
-            fi
+            yq e 'select(.kind == "Deployment" or 
+                         .kind == "StatefulSet" or 
+                         .kind == "DaemonSet" or 
+                         .kind == "Job" or 
+                         .kind == "CronJob" or 
+                         .kind == "ReplicaSet" or 
+                         .kind == "ConfigMap")' "$file" 2>/dev/null | \
+            kubectl apply -f - || true
           done
 
       - name: Tunggu workload siap (max 60s)
