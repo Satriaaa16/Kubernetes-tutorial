@@ -1,4 +1,4 @@
-name: CI Minikube Monitoring Namespace
+name: CI Minikube Deploy All
 
 on:
   pull_request:
@@ -17,30 +17,22 @@ jobs:
       - name: Start Minikube
         uses: medyagh/setup-minikube@latest
 
-      - name: Try the cluster!
-        run: kubectl get pods -A
+      - name: Test cluster up
+        run: kubectl get nodes -o wide
 
       - name: Clone repo berisi manifest
         run: git clone https://github.com/Satriaaa16/Kubernetes-tutorial.git
 
-      - name: Build image (non-functional on GitHub-hosted runner)
+      - name: Build image (opsional, hanya kalau perlu)
         run: |
           cd Kubernetes-tutorial
           minikube image build -t local/devex:v1 .
 
-      - name: Membuat namespace monitoring
+      - name: Deploy semua manifest
         run: |
-          kubectl create ns monitoring || true
-          kubectl create ns devops || true
-          
+          kubectl apply -R -f Kubernetes-tutorial/
 
-      - name: Deploy file YAML
+      - name: Tunggu semua pod ready
         run: |
-           kubectl apply -f development/cicd/jenkins/deployment.yaml -n devops
-          
-
-      - name: Cek manifest berhasil atau engga
-        run: |
-          kubectl wait --for=condition=ready pod --all -n monitoring --timeout=60s
-          kubectl get all -n monitoring
-          
+          kubectl wait --for=condition=ready pod --all --all-namespaces --timeout=120s
+          kubectl get all --all-namespaces
