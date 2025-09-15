@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sfs-elas
+  namespace: monitoring
+spec:
+  serviceName: svc-elas
+  replicas: 1
+  selector:
+    matchLabels:
+      component: sfs-elas
+  template:
+    metadata:
+      labels:
+        component: sfs-elas
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsGroup: 1000
+      initContainers:
+        - name: fix-permission
+          image: busybox
+          command: ["sh", "-c", "chown -R 1000:1000 /usr/share/elasticsearch/data"]
+          volumeMounts:
+            - name: elasticsearch-data
+              mountPath: /usr/share/elasticsearch/data
+          securityContext:
+            runAsUser: 0
+      containers:
+        - name: container-elas
+          image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
+          resources:
+            requests:
+               memory: 1Gi
+               cpu: 1
+            limits:
+               memory: 2Gi
+               cpu: 1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              port: 9200
+            initialDelaySeconds: 15
+            periodSeconds: 15
+          env:
+            - name: discovery.type
+              value: single-node
+          ports:
+            - containerPort: 9200
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - name: elasticsearch-config
+              mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+              subPath: elasticsearch.yml
+            - name: elasticsearch-data
+              mountPath: /usr/share/elasticsearch/data
+          resources:
+            requests:
+              cpu: 500m
+              memory: 5Gi
+            limits:
+              cpu: 500m
+              memory: 5Gi
+      volumes:
+        - name: elasticsearch-config
+          configMap:
+            name: elasticsearch-config
+        - name: elasticsearch-data
+          persistentVolumeClaim:
+            claimName: pvc-es

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: atgk-pod
+  labels:
+    app: atgk-pod
+spec:
+  containers:
+    - name: atgk-cont
+      image: ghcr.io/satriaaa16/my-app:1750672326
+      ports:
+        - containerPort: 80

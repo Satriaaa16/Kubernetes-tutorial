@@ -1,0 +1,48 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: kuma-gtw
+spec:
+  controllerName: "uptime.dashboard.alan.id/gateway-controller"
+  parametersRef:
+    group: uptime.dashboard.alan.id
+    kind: Config
+    name: internet-gateway-config
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: kuma-gateway
+  namespace: monitoring
+spec:
+  gatewayClassName: kuma-gtw
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: uptime.dashboard.alan.id
+      allowedRoutes:
+        kinds:
+          - kind: HTTPRoute
+        namespaces:
+          from: Same
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-kuma
+  namespace: monitoring
+spec:
+  parentRefs:
+    - name: kuma-gateway
+      namespace: monitoring
+  hostnames:
+    - "uptime.dashboard.alan.id"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: kuma-svc-local
+          port: 3001
