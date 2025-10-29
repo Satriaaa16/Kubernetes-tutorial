@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana-dep
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      component: kibana-dep
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  template:
+    metadata:
+      labels:
+        component: kibana-dep
+        namespace: monitoring
+    spec:
+      containers:
+        - name: kibana-dep
+          image: docker.elastic.co/kibana/kibana:7.12.0
+          env:
+            - name: ELASTICSEARCH_HOSTS
+              value: http://svc-elas:9200
+            - name: XPACK_SECURITY_ENABLED
+              value: "false"
+            - name: LOGGING_VERBOSE
+              value: "true"
+          ports:
+            - containerPort: 5601
+              name: http
+              protocol: TCP

@@ -9,10 +9,9 @@ data:
         Flush        5
         Daemon       Off
         Log_Level    info
+
+
         Parsers_File parsers.conf
-        Http_Server   On
-        Http_listen   0.0.0.0
-        Http_port     20
 
     [INPUT]
         Name tail
@@ -35,3 +34,4 @@ data:
         Format      json
         Time_Key    time
         Time_Format %Y-%m-%dT%H:%M:%S.%L
+
