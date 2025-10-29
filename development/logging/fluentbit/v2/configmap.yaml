@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentbit-config
+  namespace: monitoring
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        flush     1
+        log_level info
+
+    [INPUT]
+        name         kubernetes_events
+        tag          k8s_events
+        interval_sec 12000
+        kube_request_limit 120000
+        kube_namespace default
+
+    [OUTPUT]
+        name            stdout
+        match           *

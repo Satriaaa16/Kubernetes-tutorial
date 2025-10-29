@@ -1,11 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-   name: pvc-kuma
+   name: pvc-fluentbit
    namespace: monitoring
 spec:
    accessModes:
-    - ReadWriteOnce 
+     - ReadWriteOnce
    resources:
-    requests:
-      storage: 1Gi
+     requests:
+       storage: 2Gi
+    

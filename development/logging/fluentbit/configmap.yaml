@@ -10,6 +10,9 @@ data:
         Daemon       Off
         Log_Level    info
         Parsers_File parsers.conf
+        Http_Server   On
+        Http_listen   0.0.0.0
+        Http_port     20
 
     [INPUT]
         Name tail
