@@ -30,7 +30,19 @@ spec:
       containers:
         - name: container-elas
           image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
+          resources:
+            requests:
+               memory: 1Gi
+               cpu: 1
+            limits:
+               memory: 2Gi
+               cpu: 1
           imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              port: 9200
+            initialDelaySeconds: 15
+            periodSeconds: 15
           env:
             - name: discovery.type
               value: single-node
@@ -47,11 +59,10 @@ spec:
           resources:
             requests:
               cpu: 500m
-              memory: 4Gi
+              memory: 5Gi
             limits:
               cpu: 500m
-              memory: 4Gi
-      restartPolicy: Always
+              memory: 5Gi
       volumes:
         - name: elasticsearch-config
           configMap:

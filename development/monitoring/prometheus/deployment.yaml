@@ -34,15 +34,30 @@ spec:
             - "--config.file=/etc/prometheus-config/prometheus.yml"
           ports:
             - containerPort: 9090
+          resources:
+            requests:
+              cpu: "8m"
+              memory: "40Mi"
+            limits:
+               cpu: "10m"
+               memory: "60Mi"
           livenessProbe:
             httpGet: 
-              path: /
               port: 9090
-            initialDelaySeconds: 3
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            terminationGracePeriodSeconds: 30
+          readinessProbe:
+            httpGet:
+                port: 9090
+            initialDelaySeconds: 4
             periodSeconds: 5
-            #  failureThreshold: 10
-            #  successThreshold: 3
-            #  timeoutSeconds: 5
+            timeoutSeconds: 4
+            successThreshold: 5
+            failureThreshold: 3
           volumeMounts:
             - name: promeprome-data
               mountPath: /etc/prometheus
@@ -83,7 +98,7 @@ metadata:
   labels:
     name: ingress-prome
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   rules:
     - host: monitoring.alan.computer.my.id
       http:
