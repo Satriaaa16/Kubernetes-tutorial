@@ -44,20 +44,20 @@ spec:
           livenessProbe:
             httpGet: 
               port: 9090
-            initialDelaySeconds: 10
-            periodSeconds: 15
-            failureThreshold: 10
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 20
             successThreshold: 1
-            timeoutSeconds: 5
+            timeoutSeconds: 10
             terminationGracePeriodSeconds: 30
           readinessProbe:
             httpGet:
                 port: 9090
-            initialDelaySeconds: 4
-            periodSeconds: 5
-            timeoutSeconds: 4
-            successThreshold: 5
-            failureThreshold: 3
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 20
+            successThreshold: 1
+            failureThreshold: 10
           volumeMounts:
             - name: promeprome-data
               mountPath: /etc/prometheus
@@ -98,7 +98,7 @@ metadata:
   labels:
     name: ingress-prome
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   rules:
     - host: monitoring.alan.computer.my.id
       http:
